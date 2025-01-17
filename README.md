@@ -93,27 +93,35 @@ composer install
 ```bash
 cp .env.example .env
 ```
-2. Update the database variables in the .env file to match the database service in Docker:
+3. Generate the application key:
+```bash
+php artisan key:generate
+```
+4. Update the database variables in the .env file to match the database service in Docker:
 ```
 DB_CONNECTION=mysql
 DB_HOST=db
 DB_PORT=3306
-DB_DATABASE=homestead
-DB_USERNAME=homestead
-DB_PASSWORD=secret
+DB_DATABASE=news_aggregator_db
+DB_USERNAME=news_aggregator_user
+DB_PASSWORD=123Aggregator987
 ```
-3. Ensure the following variables are updated in your .env file to enable the scraping functionality:
+5. Ensure the following variables are updated in your .env file to enable the scraping functionality:
 ```
 THE_GUARDIAN_API_TOKEN=<your_guardian_api_token_here>
 NEWS_API_ORG_API_TOKEN=<your_news_api_org_api_token_here>
 NEW_YORK_TIMES_API_TOKEN=<your_nyt_api_token_here>
-
 ```
+6. Clear cache:
+```bash
+php artisan optimize
+```
+
 #### Frontend
 1. Create a .env file in the frontend repository with the following content:
 ```
 VITE_APP_NAME="News Aggregator Website"
-VITE_APP_API_URL=http://localhost:9001
+VITE_APP_API_URL=http://localhost:9001/api
 ```
 2. Run npm install to install all required dependencies
 ```bash
@@ -127,6 +135,7 @@ Navigate to the docker-setup directory and run:
 ```bash
 cd news-aggregator-website-docker-setup
 docker-compose up --build
+docker-compose exec backend php artisan config:cache
 ```
 
 This command will:

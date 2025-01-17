@@ -3,11 +3,11 @@ version: '3.9'
 services:
   backend:
     build:
-      context: ./backend
+      context: ../news-aggregator-website-backend
     container_name: laravel-backend
     restart: always
     volumes:
-      - ./backend:/var/www
+      - ../news-aggregator-website-backend:/var/www
     networks:
       - app-network
     depends_on:
@@ -26,7 +26,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ../news-aggregator-website-frontend
     container_name: react-frontend
     restart: always
     ports:
@@ -42,21 +42,21 @@ services:
     ports:
       - "9001:80"
     volumes:
-      - ./backend:/var/www
+      - ../news-aggregator-website-backend:/var/www
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
     networks:
       - app-network
 
-  # Database Service (MySQL or MariaDB)
+  # Database Service (MySQL)
   db:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: homestead
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: news_aggregator_db
+      MYSQL_USER: news_aggregator_user
+      MYSQL_PASSWORD: 123Aggregator987
     ports:
       - "3307:3306"
     networks:
