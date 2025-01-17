@@ -23,7 +23,7 @@ Both applications are Dockerized, and a single `docker-compose` environment is p
 6. [Running Commands](#running-commands)
    - [Backend Commands](#backend-commands)
    - [Frontend Commands](#frontend-commands)
-7. [Data Scraping and Filtering](#data-scraping-and-filtering)
+7. [Data Scraping](#data-scraping-and-filtering)
 8. [Best Practices](#best-practices)
 9. [Troubleshooting](#troubleshooting)
 
@@ -84,37 +84,59 @@ project-root/
 
 ### 2. Environment Configuration
 #### Backend
-1. Copy the .env.example file in the backend repository and rename it to .env:
+1. Run composer install to install all project dependencies
 ```bash
-cp backend/.env.example backend/.env
+cd news-aggregator-website-backend/
+composer install
 ```
-2. Update the DB_HOST in the .env file to match the database service in Docker:
+2. Copy the .env.example file in the backend repository and rename it to .env:
+```bash
+cp .env.example .env
 ```
-DB_HOST=mysql
+2. Update the database variables in the .env file to match the database service in Docker:
+```
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=homestead
+DB_USERNAME=homestead
+DB_PASSWORD=secret
+```
+3. Ensure the following variables are updated in your .env file to enable the scraping functionality:
+```
+THE_GUARDIAN_API_TOKEN=<your_guardian_api_token_here>
+NEWS_API_ORG_API_TOKEN=<your_news_api_org_api_token_here>
+NEW_YORK_TIMES_API_TOKEN=<your_nyt_api_token_here>
+
 ```
 #### Frontend
 1. Create a .env file in the frontend repository with the following content:
 ```
-VITE_APP_API_URL=http://localhost:9000
+VITE_APP_NAME="News Aggregator Website"
+VITE_APP_API_URL=http://localhost:9001
 ```
-
-2. Adjust other frontend environment variables as needed
+2. Run npm install to install all required dependencies
+```bash
+cd news-aggregator-website-frontend/
+npm install
+```
+3. Adjust other frontend environment variables as needed
 
 ### 3. Build and Run Containers
 Navigate to the docker-setup directory and run:
 ```bash
-cd docker-setup
+cd news-aggregator-website-docker-setup
 docker-compose up --build
 ```
 
 This command will:
 1. Build and run the backend, frontend, and database containers. 
-2. Expose the backend on port 9000 and the frontend on port 3000.
+2. Expose the backend on port 9001 and the frontend on port 3000.
 
 ---
 
 ## **Accessing the Applications**
-1. Backend: http://localhost:9000
+1. Backend: http://localhost:9001
 2. Frontend: http://localhost:3000
 
 ---
@@ -122,7 +144,7 @@ This command will:
 ## **Running Commands**
 
 ### Backend Commands
-Run Laravel-specific commands inside the backend container:
+[Action Required] Run Laravel-specific commands inside the backend container:
 ```bash
 # Access the backend container
 docker exec -it laravel-backend bash
@@ -130,28 +152,25 @@ docker exec -it laravel-backend bash
 # Run Artisan commands
 php artisan migrate
 php artisan db:seed
-php artisan schedule:run
+
+# To initiate data scraping, run the command below. Alternatively, you can ignore this and use the manual command provided under [Data Scraping]:
+php artisan schedule:run 
+
 docker-compose up --build
 ```
 
 ### Frontend Commands
-Run frontend-specific commands inside the frontend container:
+To run frontend-specific commands inside the frontend container, you can using:
 ```bash
 # Access the frontend container
 docker exec -it react-frontend bash
-
-# Install dependencies
-npm install
-
-# Start the development server (if needed)
-npm start
 ```
 ---
 
-## **Data Scraping and Filtering**
-Run the scraper manually for testing:
+## **Data Scraping**
+To run the scraper manually for testing:
 ```bash
-docker exec -it laravel-backend php artisan scrape:data
+docker exec -it laravel-backend php artisan articles:scrape-all
 ```
 ---
 
@@ -159,11 +178,7 @@ docker exec -it laravel-backend php artisan scrape:data
 This project follows modern software development principles:
 1. DRY (Don't Repeat Yourself): Common logic is reused across the codebase.
 2. KISS (Keep It Simple, Stupid): Simplicity is prioritized to ensure maintainability.
-3. SOLID Principles:
-   1. Single Responsibility: Each module focuses on a single task. 
-   2. Open-Closed: Modules can be extended without modifying existing code.
-   3. Dependency Inversion: Interfaces are preferred over concrete implementations.
-
+3. SOLID Principles
 ---
 
 ## **Troubleshooting**
